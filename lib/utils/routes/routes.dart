@@ -1,5 +1,7 @@
+import 'package:flutter_tour_app_firebase/ui/app/booked_trip_screen.dart';
+import 'package:flutter_tour_app_firebase/ui/app/trip_details_screen.dart';
 import 'package:flutter_tour_app_firebase/ui/home/home.dart';
-import 'package:flutter_tour_app_firebase/ui/login/vendor_dashboard.dart';
+
 
 import 'package:flutter_tour_app_firebase/ui/splash/splash.dart';
 import 'package:flutter/material.dart';
@@ -14,15 +16,15 @@ class Routes {
   static const String login = '/login';
   static const String home = '/home';
   static const String register = '/vendor_dashboard';
-  static const String trip_details = '/driver_map';
-  static const String bookedTrip = '/verify_otp';
+  static const String trip_details = '/trip_details';
+  static const String bookedTrip = '/booked_trip';
 
   static final routes = <String, WidgetBuilder>{
     splash: (BuildContext context) => SplashScreen(),
     login: (BuildContext context) => LoginScreen(),
     home: (BuildContext context) => HomeScreen(),
-    trip_details: (BuildContext context) => VendorDashboard(),
-    bookedTrip: (BuildContext context) => VendorDashboard(),
+    trip_details: (BuildContext context) => TripDetailsScreen(),
+    bookedTrip: (BuildContext context) => BookedTripScreen(),
 
   };
 }

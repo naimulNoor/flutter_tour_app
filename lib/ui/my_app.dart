@@ -10,7 +10,6 @@ import 'package:flutter_tour_app_firebase/stores/firebase_user/firebaseuser_stor
 import 'package:flutter_tour_app_firebase/stores/vendor/vendor_store.dart';
 import 'package:flutter_tour_app_firebase/ui/app/home_screen.dart';
 import 'package:flutter_tour_app_firebase/ui/app/register_screen.dart';
-import 'package:flutter_tour_app_firebase/ui/login/vendor_dashboard.dart';
 import 'package:flutter_tour_app_firebase/utils/routes/routes.dart';
 import 'package:flutter_tour_app_firebase/stores/language/language_store.dart';
 import 'package:flutter_tour_app_firebase/stores/post/post_store.dart';
