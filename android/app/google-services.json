@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "271524161629",
+    "project_id": "flutter-tour-app",
+    "storage_bucket": "flutter-tour-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:271524161629:android:84987f1d1c46c93f5f85b4",
+        "android_client_info": {
+          "package_name": "com.tutorial.tour.flutter_tour_app_firebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "271524161629-tt8th86sq0goas3km1o76j8ugcj2uo7e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2tsRkuxd8IgYlhwghf3IZlVkhOgGVf98"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "271524161629-tt8th86sq0goas3km1o76j8ugcj2uo7e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
