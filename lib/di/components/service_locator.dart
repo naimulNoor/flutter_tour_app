@@ -8,7 +8,7 @@ import 'package:flutter_tour_app_firebase/data/network/rest_client.dart';
 import 'package:flutter_tour_app_firebase/data/repository.dart';
 import 'package:flutter_tour_app_firebase/data/repository/firebase_auth_repository.dart';
 import 'package:flutter_tour_app_firebase/data/sharedpref/shared_preference_helper.dart';
-import 'package:flutter_tour_app_firebase/data/vendor_firestore_repository.dart';
+import 'package:flutter_tour_app_firebase/data/trip_firestore_repository.dart';
 import 'package:flutter_tour_app_firebase/di/module/local_module.dart';
 import 'package:flutter_tour_app_firebase/di/module/network_module.dart';
 import 'package:flutter_tour_app_firebase/stores/driver/driver_store.dart';
@@ -18,8 +18,7 @@ import 'package:flutter_tour_app_firebase/stores/form/form_store.dart';
 import 'package:flutter_tour_app_firebase/stores/language/language_store.dart';
 import 'package:flutter_tour_app_firebase/stores/post/post_store.dart';
 import 'package:flutter_tour_app_firebase/stores/theme/theme_store.dart';
-import 'package:flutter_tour_app_firebase/stores/user/user_store.dart';
-import 'package:flutter_tour_app_firebase/stores/vendor/vendor_store.dart';
+import 'package:flutter_tour_app_firebase/stores/trip/trip_store.dart';
 import 'package:get_it/get_it.dart';
 import 'package:sembast/sembast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,16 +52,18 @@ Future<void> setupLocator() async {
     getIt<SharedPreferenceHelper>(),
     getIt<PostDataSource>(),
   ));
-  getIt.registerSingleton(VendorFireStoreRepository());
+  getIt.registerSingleton(TripFireStoreRepository());
   getIt.registerSingleton(DriverFireStoreRepository());
-  getIt.registerSingleton(FireAuthRepository());
+  getIt.registerSingleton(FireAuthRepository(
+    getIt<SharedPreferenceHelper>(),
+  ));
 
   // stores:--------------------------------------------------------------------
   getIt.registerSingleton(LanguageStore(getIt<Repository>()));
   getIt.registerSingleton(PostStore(getIt<Repository>()));
   getIt.registerSingleton(ThemeStore(getIt<Repository>()));
-  getIt.registerSingleton(UserStore(getIt<Repository>()));
-  getIt.registerSingleton(VendorStore(getIt<VendorFireStoreRepository>()));
+
+  getIt.registerSingleton(TripStore(getIt<TripFireStoreRepository>()));
   getIt.registerSingleton(DriverStore(getIt<DriverFireStoreRepository>()));
   getIt.registerSingleton(FirebaseUser(getIt<FireAuthRepository>()));
 

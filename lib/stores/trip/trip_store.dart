@@ -1,16 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_tour_app_firebase/data/trip_firestore_repository.dart';
+import 'package:flutter_tour_app_firebase/models/app/trip_model.dart';
 import 'package:flutter_tour_app_firebase/stores/error/error_store.dart';
 import 'package:mobx/mobx.dart';
 
 import '../../data/repository.dart';
 import '../form/form_store.dart';
 
-part 'user_store.g.dart';
+part 'trip_store.g.dart';
 
-class UserStore = _UserStore with _$UserStore;
+class TripStore = _TripStore with _$TripStore;
 
-abstract class _UserStore with Store {
+abstract class _TripStore with Store {
   // repository instance
-  final Repository _repository;
+  final TripFireStoreRepository _repository;
 
   // store for handling form errors
   final FormErrorStore formErrorStore = FormErrorStore();
@@ -22,15 +25,11 @@ abstract class _UserStore with Store {
   bool isLoggedIn = false;
 
   // constructor:---------------------------------------------------------------
-  _UserStore(Repository repository) : this._repository = repository {
+  _TripStore(TripFireStoreRepository repository) : this._repository = repository {
 
     // setting up disposers
     _setupDisposers();
 
-    // checking if user is logged in
-    repository.isLoggedIn.then((value) {
-      this.isLoggedIn = value;
-    });
   }
 
   // disposers:-----------------------------------------------------------------
@@ -43,45 +42,63 @@ abstract class _UserStore with Store {
   }
 
   // empty responses:-----------------------------------------------------------
-  static ObservableFuture<bool> emptyLoginResponse =
-  ObservableFuture.value(false);
+ // static ObservableStream<QuerySnapshot> emptyLoginResponse =ObservableStream as ObservableStream<QuerySnapshot>;
 
   // store variables:-----------------------------------------------------------
   @observable
   bool success = false;
 
+
   @observable
-  ObservableFuture<bool> loginFuture = emptyLoginResponse;
+  bool loader = false;
 
   @computed
-  bool get isLoading => loginFuture.status == FutureStatus.pending;
+  bool get isLoading => loader;
+
+  @observable
+  bool tripBooked = false;
+
+  @computed
+  bool get isTripBooked => tripBooked;
+
+
 
   // actions:-------------------------------------------------------------------
   @action
-  Future login(String email, String password) async {
+     Stream<QuerySnapshot> getAllTripList(){
+    loader =true;
+    final stream = _repository.getTripList();
 
-    final future = _repository.login(email, password);
-    loginFuture = ObservableFuture(future);
-    await future.then((value) async {
-      if (value) {
-        _repository.saveIsLoggedIn(true);
-        this.isLoggedIn = true;
-        this.success = true;
-      } else {
-        print('failed to login');
-      }
-    }).catchError((e) {
-      print(e);
-      this.isLoggedIn = false;
-      this.success = false;
-      throw e;
-    });
+    return stream;
+
+  }
+  @action
+     bookedTrip(String? id ,int i){
+     print(id);
+    loader =true;
+     _repository.bookedTip(id!,i);
+    tripBooked=true;
+     loader =false;
+
+
+
   }
 
-  logout() {
-    this.isLoggedIn = false;
-    _repository.saveIsLoggedIn(false);
+
+  @action
+  Stream<QuerySnapshot> getAllTripListTwo() {
+    loader = true;
+    final stream = _repository.getTripListTwo();
+    return stream;
   }
+  @action
+  Stream<QuerySnapshot> getBookedTripList() {
+    loader = true;
+    final stream = _repository.getBookedTripList();
+    return stream;
+  }
+
+
 
   // general methods:-----------------------------------------------------------
   void dispose() {

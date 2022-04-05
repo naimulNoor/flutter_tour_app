@@ -1,8 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_tour_app_firebase/data/sharedpref/shared_preference_helper.dart';
 import 'package:flutter_tour_app_firebase/models/app/firebase_user.dart';
 
 class FireAuthRepository {
+
+  // shared pref object
+  final SharedPreferenceHelper _sharedPrefsHelper;
+  // constructor
+  FireAuthRepository(this._sharedPrefsHelper);
+
+
 
    Future<dynamic> registerUsingEmailPassword({
     required FirebaseAuthModel model
@@ -31,7 +39,7 @@ class FireAuthRepository {
     return user;
   }
 
-   Future<User?> signInUsingEmailPassword({
+   Future<dynamic> signInUsingEmailPassword({
      required FirebaseAuthModel model,
     required BuildContext context,
   }) async {
@@ -44,19 +52,24 @@ class FireAuthRepository {
         password: model.password!,
       );
       user = userCredential.user;
+      //save data to local storage
+      FirebaseAuthModel newUser=FirebaseAuthModel(user?.displayName,user?.email,"");
+       _sharedPrefsHelper.saveFirebaseUser(newUser.toJson());
+       print("store::${_sharedPrefsHelper.getFirebaseUser.email}");
+
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        print('No user found for that email.');
+        return 'No user found for that email.';
       } else if (e.code == 'wrong-password') {
-        print('Wrong password provided.');
+        return 'Wrong password provided.';
       }
     }
 
     return user;
   }
 
-   firebaseUserSignOut(){
-    FirebaseAuth.instance.signOut();
+   firebaseUserSignOut() async{
+    await FirebaseAuth.instance.signOut();
   }
 
 

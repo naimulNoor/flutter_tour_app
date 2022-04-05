@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_tour_app_firebase/models/app/firebase_user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'constants/preferences.dart';
@@ -49,5 +52,17 @@ class SharedPreferenceHelper {
 
   Future<void> changeLanguage(String language) {
     return _sharedPreference.setString(Preferences.current_language, language);
+  }
+
+  // Language:---------------------------------------------------
+  FirebaseAuthModel get getFirebaseUser {
+    Map userMap = jsonDecode(_sharedPreference.getString(Preferences.firebase_user)!);
+    var user = FirebaseAuthModel.fromJson(userMap);
+    return user;
+  }
+
+  Future<void> saveFirebaseUser(Map _jsonStirng) {
+    String user = jsonEncode(FirebaseAuthModel.fromJson(_jsonStirng));
+    return _sharedPreference.setString(Preferences.firebase_user, user);
   }
 }

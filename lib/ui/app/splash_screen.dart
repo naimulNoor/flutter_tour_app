@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_tour_app_firebase/utils/routes/routes.dart';
 import 'package:another_flushbar/flushbar_helper.dart';
 import 'package:flutter/foundation.dart';
@@ -16,21 +17,15 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginScreen extends StatefulWidget {
+class SplashScreen extends StatefulWidget {
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin{
+class _LoginScreenState extends State<SplashScreen> with TickerProviderStateMixin{
   //text controllers:-----------------------------------------------------------
 
 
-  int checkedIndex = 0;
-
-  List cardNames = [
-    'Driver',
-    'Verdor',
-  ];
 
   TextEditingController _phoneController = TextEditingController();
   bool _obscureText = false;
@@ -72,6 +67,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     // initializing stores
     _languageStore = Provider.of<LanguageStore>(context);
     _themeStore = Provider.of<ThemeStore>(context);
+    _checkUser();
 
 
   }
@@ -88,176 +84,22 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   // body methods:--------------------------------------------------------------
   Widget _buildBody() {
     return  SafeArea(
-      child: SingleChildScrollView(
+      child: Container(
+        color: Colors.blue,
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            //Form(
-            // key: _loginFormKey,
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Column(
-                children: [
-                  SizedBox(height: 50,),
-                  Text('Logo',
-                      style:
-                      TextStyle(
-                          fontSize: 44,
-                          fontWeight: FontWeight.bold
-                      )
-                  ),
-                  SizedBox(height: 15,),
-                  Text("Signup As",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      )
-                  ),
-                  SizedBox(height: 20,),
+            Center(child: Text("Tour App",style: TextStyle(fontSize: 30.0,color: Colors.white))),
+            SizedBox(height: 50,),
+            CircularProgressIndicator()
 
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _obscure=false;
-                            _obscureText = !_obscureText;
-                            currentTap =0;
-                          });
-                        },
-                        child: Card(
-                          elevation: 10,
-                          color: _obscureText ? Colors.green : Colors.white,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(30),
-                            child: Column(
-                              children: [
-                                Icon(
-                                  Icons.person,
-                                  size: 40,
-                                  color: _obscureText
-                                      ? Colors.white
-                                      : Colors.black,
-                                ),
-                                Text(
-                                  'Driver',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      color: _obscureText
-                                          ? Colors.white
-                                          : Colors.black),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(width: 30,),
-
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _obscureText=false;
-                            _obscure = !_obscure;
-
-                            currentTap=1;
-                          });
-                        },
-                        child: Card(
-                          elevation: 10,
-                          color: _obscure ? Colors.green : Colors.white,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(30),
-                            child: Column(
-                              children: [
-                                Icon(
-                                  Icons.person,
-                                  size: 40,
-                                  color: _obscure
-                                      ? Colors.white
-                                      : Colors.black,
-                                ),
-                                Text(
-                                  'Vendor',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      color: _obscure
-                                          ? Colors.white
-                                          : Colors.black),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: 20,),
-
-                  TextFormField(
-                    controller: _phoneController,
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (value){
-                      if(value!.isEmpty){
-                        return 'Please Enter Valid Info';
-                      }else{
-                        return null;
-                      }
-                    },
-                    // focusNode: _emailNode,
-                    textInputAction: TextInputAction.next,
-                    //onEditingComplete: () => FocusScope.of(context).requestFocus(_passNode),
-                    decoration: InputDecoration(
-                        fillColor: Colors.white,
-                        filled: true,
-                        //labelText: 'Enter username',
-                        hintText: "Enter mobile number",
-                        enabledBorder:OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        errorBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.red,width: 5),
-                          borderRadius: BorderRadius.circular(10),
-                        )
-                    ),
-                  ),
-
-                  SizedBox(height: 30,),
-
-                  MaterialButton(
-                    onPressed: (){},
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
-                    minWidth: MediaQuery.of(context).size.width,
-                    height: 50,
-
-                    child: Text(
-                      'NEXT',style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                        color: Colors.white
-                    ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
-      ),
+
+      )
     );
   }
 
@@ -291,5 +133,37 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     super.dispose();
   }
 
+  Widget navigate(BuildContext context,int type) {
+    if(type==1){
+      Future.delayed(Duration(milliseconds: 0), () {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+            Routes.login, (Route<dynamic> route) => false);
+      });
+    }
+    else if(type==2){
+      Future.delayed(Duration(milliseconds: 0), () {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+            Routes.home, (Route<dynamic> route) => false);
+      });
+    }
 
-}
+
+    return Container();
+  }
+
+
+  void _checkUser() async{
+
+      if(FirebaseAuth.instance.currentUser?.uid == null)
+      {
+        print("logout-user");
+        navigate(context,1);
+      }
+      else{
+        print("login-user");
+        navigate(context,2);
+      }
+    }
+  }
+
+

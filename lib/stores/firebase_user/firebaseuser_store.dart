@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_tour_app_firebase/data/driver_firestore_repository.dart';
 import 'package:flutter_tour_app_firebase/data/repository/firebase_auth_repository.dart';
+import 'package:flutter_tour_app_firebase/data/sharedpref/shared_preference_helper.dart';
 import 'package:flutter_tour_app_firebase/models/app/driver.dart';
 import 'package:flutter_tour_app_firebase/models/app/firebase_user.dart';
 import 'package:flutter_tour_app_firebase/stores/error/error_store.dart';
@@ -15,6 +16,7 @@ class FirebaseUser = _FirebaseUserStore with _$FirebaseUser;
 abstract class _FirebaseUserStore with Store {
   // repository instance
   final FireAuthRepository _repository;
+
 
   // store for handling form errors
 
@@ -33,6 +35,16 @@ abstract class _FirebaseUserStore with Store {
   bool showErrorMsg=false;
   @computed
   bool get showMessage => showErrorMsg;
+
+  @observable
+  bool userRegister=false;
+  @computed
+  bool get getUserRegister => userRegister;
+
+  @observable
+  bool userLogin=false;
+  @computed
+  bool get getUserLogin => userLogin;
 
   @observable
   String errorMsg="";
@@ -80,7 +92,6 @@ abstract class _FirebaseUserStore with Store {
   Future registerUser(String name,String email,String password) async {
     this.isUserCreated=true;
     showErrorMsg=false;
-    this.success = false;
     print("firebase-store");
     print(name);
     FirebaseAuthModel user=new FirebaseAuthModel(name,email,password);
@@ -89,51 +100,51 @@ abstract class _FirebaseUserStore with Store {
     await future.then((value) async {
       if(value is String){
         this.isUserCreated=false;
+        this.userRegister=false;
         showErrorMsg=true;
         errorMsg=value;
       }else{
         this.isUserCreated=false;
         this.success = true;
+        this.userRegister=true;
       }
 
 
     }).catchError((e) {
+      print("error: ${e}");
       this.isUserCreated=false;
-      this.success = false;
+      //this.success = false;
       throw e;
     });
   }
 
   @action
-  Future logout(String name,String email,String password) async {
-    this.isUserCreated=true;
-    FirebaseAuthModel user=new FirebaseAuthModel(name,email,password);
-    final future = _repository.registerUsingEmailPassword(model: user);
-    addUserTask= ObservableFuture(future);
-    await future.then((value) async {
-      this.isUserCreated=false;
-      this.success = true;
-
-    }).catchError((e) {
-      this.isUserCreated=false;
-      this.success = false;
-      throw e;
-    });
+  Future logout() async {
+    final future = _repository.firebaseUserSignOut();
+    return future;
   }
 
   @action
   Future loginUser(String email,String password,BuildContext context) async {
     //this.isUserCreated=true;
     FirebaseAuthModel user=new FirebaseAuthModel("",email,password);
+    print(user.email);
     final future = _repository.signInUsingEmailPassword(model: user, context: context);
     addUserTask= ObservableFuture(future);
     await future.then((value) async {
-      this.isUserCreated=false;
-      this.success = true;
+
+      if(value is String){
+        this.isUserCreated=false;
+        showErrorMsg=true;
+        errorMsg=value as String;
+      }else{
+        this.userLogin=true;
+
+      }
 
     }).catchError((e) {
       this.isUserCreated=false;
-      this.success = false;
+      //this.success = false;
       throw e;
     });
   }

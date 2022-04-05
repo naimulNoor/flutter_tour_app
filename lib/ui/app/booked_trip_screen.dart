@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_tour_app_firebase/stores/trip/trip_store.dart';
 import 'package:flutter_tour_app_firebase/utils/routes/routes.dart';
 import 'package:another_flushbar/flushbar_helper.dart';
 
@@ -28,10 +30,6 @@ class _LoginScreenState extends State<BookedTripScreen> with TickerProviderState
 
   int checkedIndex = 0;
 
-  List cardNames = [
-    'Driver',
-    'Verdor',
-  ];
 
   TextEditingController _phoneController = TextEditingController();
   bool _obscureText = false;
@@ -43,6 +41,7 @@ class _LoginScreenState extends State<BookedTripScreen> with TickerProviderState
 
   late ThemeStore _themeStore;
   late LanguageStore _languageStore;
+  late TripStore _tripStore;
 
 
   //focus node:-----------------------------------------------------------------
@@ -73,6 +72,7 @@ class _LoginScreenState extends State<BookedTripScreen> with TickerProviderState
     // initializing stores
     _languageStore = Provider.of<LanguageStore>(context);
     _themeStore = Provider.of<ThemeStore>(context);
+    _tripStore=Provider.of<TripStore>(context);
 
 
   }
@@ -84,8 +84,8 @@ class _LoginScreenState extends State<BookedTripScreen> with TickerProviderState
       appBar:AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0.0,
-        leading: Icon(Icons.chevron_left),
-        title: Text("Innenlandsturer"),
+        leading: Icon(Icons.chevron_left,color: Colors.blue,),
+        title: Text("Booked Trip",style: TextStyle(color: Colors.blue),),
       ),
       body: _buildBody(),
     );
@@ -94,14 +94,13 @@ class _LoginScreenState extends State<BookedTripScreen> with TickerProviderState
   // body methods:--------------------------------------------------------------
   Widget _buildBody() {
     return  SafeArea(
-      child: SingleChildScrollView(
         child: Column(
-          children: [
-            _searchBar(),
-            _bookedTrip(),
-
-          ],
-        ),
+            children: [
+              _searchBar(),
+              Expanded(
+                child: _bookedTrip(),
+              )
+            ],
       ),
     );
   }
@@ -150,92 +149,113 @@ class _LoginScreenState extends State<BookedTripScreen> with TickerProviderState
 
   Widget _bookedTrip() {
     return Container(
-      margin: const EdgeInsets.all(10.0),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Innenlandsturer",style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.bold),),
-              Row(
-                children: [
-                  Text("Se aile",style: TextStyle(color: Colors.blue),),
-                  SizedBox(width: 5,),
-                  Icon(Icons.arrow_forward,size: 15.0,color: Colors.blue,)
-                ],
-              ),
+      padding: EdgeInsets.all(15.0),
+            child: StreamBuilder<QuerySnapshot>(
+                stream: _tripStore.getBookedTripList(),
+                builder: (context, snapshot) {
+                  if(snapshot.hasData){
 
-            ],
-          ),
-          SizedBox(height: 10.0,),
-          Container(
-            height: MediaQuery.of(context).size.height,
-            child: ListView.builder(
-                scrollDirection: Axis.vertical,
-                itemCount: 10,
-                itemBuilder: (context,i){
+                    print(snapshot.data?.docs[0].id.toString());
+                    return ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        itemCount: snapshot.data?.size,
+                        itemBuilder: (context,i){
+                          return Container(
+                            width: 300,
+                            margin: const EdgeInsets.all(10.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Stack(
+                                      clipBehavior: Clip.none,
+                                      alignment: Alignment.bottomRight,
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(10.0),
+                                              color: Colors.blue,
+                                              image: DecorationImage(
+                                                  fit: BoxFit.cover,
+                                                  image: NetworkImage(snapshot.data?.docs[i].get("trip_img"))
+                                              )
+                                          ),
+                                          height: 100,width: 120,
+                                        ),
+
+                                      ],
+                                    ),
+                                    SizedBox(width: 10,),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(snapshot.data?.docs[i].get("trip_name"),style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20.0),),
+                                        SizedBox(height: 2,),
+                                        Container(
+                                            width: 100,
+                                            child: Text(snapshot.data?.docs[i].get("subtitle"),overflow: TextOverflow.ellipsis,style: TextStyle(color: Colors.grey,fontSize: 12.0),)),
+                                        SizedBox(height: 2,),
+                                        Row(
+                                          children: [
+                                            Icon(Icons.calendar_today,size: 15.0,),
+                                            SizedBox(width: 10.0,),
+                                            Text(snapshot.data?.docs[i].get("date"))
+                                          ],
+                                        ),
+                                        SizedBox(height: 2,),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Text(snapshot.data?.docs[i].get("ndkdata"),style: TextStyle(color: Colors.blue),),
+                                                SizedBox(width: 10.0),
+                                                Text(snapshot.data?.docs[i].get("dager"),style: TextStyle(color: Colors.grey),),
+
+                                              ],
+                                            ),
+
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
+
+                                InkWell(
+                                    onTap: (){
+                                      navigate(context,snapshot.data?.docs[i],1);
+                                    },
+                                    child: CircleAvatar(child: Icon(Icons.arrow_forward,color: Colors.white,),backgroundColor: Colors.orange,)),
+
+
+                              ],
+                            ),
+                          );
+                        });
+                  }
                   return Container(
-                    width: 300,
-                    margin: const EdgeInsets.all(10.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Stack(
-                          clipBehavior: Clip.none,
-                          alignment: Alignment.bottomRight,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10.0),
-                                color: Colors.blue,
-                              ),
-                              height: 100,width: 150,
-                            ),
+                      child: CircularProgressIndicator());
 
-                          ],
-                        ),
-                        SizedBox(width: 10,),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text("Norge",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20.0),),
-                            SizedBox(height: 2,),
-                            Text("Demo Tour Details",style: TextStyle(color: Colors.grey,fontSize: 12.0),),
-                            SizedBox(height: 2,),
-                            Row(
-                              children: [
-                                Icon(Icons.calendar_today,size: 15.0,),
-                                SizedBox(width: 10.0,),
-                                Text("06/06/2021")
-                              ],
-                            ),
-                            SizedBox(height: 2,),
-                            Row(
-                              children: [
-                                Text("NDK 19990",style: TextStyle(color: Colors.blue),),
-                                SizedBox(width: 10.0),
-                                Text("9 Dager",style: TextStyle(color: Colors.grey),),
-                                SizedBox(width: 10.0),
-                                CircleAvatar(child: Icon(Icons.arrow_forward,color: Colors.white,),backgroundColor: Colors.orange,),
-                              ],
-                            )
-                          ],
-                        ),
-
-
-                      ],
-                    ),
-                  );
-                }),
-          )
-        ],
-      ),
-
-    );
+                }
+            ),
+          );
   }
 
+  navigate(BuildContext context, QueryDocumentSnapshot<Object?>? doc, int i) {
 
+    Future.delayed(Duration(milliseconds: 0), () {
+      Navigator.of(context).pushNamed(Routes.trip_details,arguments:
+      {
+        "data":doc,
+        "type":i,
+      }
+      );
+    });
+  }
 
 
   // General Methods:-----------------------------------------------------------

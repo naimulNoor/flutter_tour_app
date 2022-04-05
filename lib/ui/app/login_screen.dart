@@ -1,3 +1,4 @@
+import 'package:flutter_tour_app_firebase/stores/firebase_user/firebaseuser_store.dart';
 import 'package:flutter_tour_app_firebase/utils/routes/routes.dart';
 import 'package:another_flushbar/flushbar_helper.dart';
 
@@ -26,7 +27,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   //text controllers:-----------------------------------------------------------
 
 
-  TextEditingController _phoneController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
   bool _obscureText = false;
   bool _obscure = false;
 
@@ -36,6 +38,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
   late ThemeStore _themeStore;
   late LanguageStore _languageStore;
+  late FirebaseUser _firebaseUserStore;
 
 
   //focus node:-----------------------------------------------------------------
@@ -66,6 +69,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     // initializing stores
     _languageStore = Provider.of<LanguageStore>(context);
     _themeStore = Provider.of<ThemeStore>(context);
+    _firebaseUserStore=Provider.of<FirebaseUser>(context);
 
 
   }
@@ -106,7 +110,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
 
                   TextFormField(
-                    controller: _phoneController,
+                    controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     validator: (value){
                       if(value!.isEmpty){
@@ -138,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                   ),
                   SizedBox(height: 10,),
                   TextFormField(
-                    controller: _phoneController,
+                    controller: _passwordController,
                     keyboardType: TextInputType.emailAddress,
                     validator: (value){
                       if(value!.isEmpty){
@@ -184,6 +188,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                   MaterialButton(
                     color: Colors.blue,
                     onPressed: (){
+                      _loginTask();
                  },
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
@@ -206,14 +211,44 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
                       children: [
                         Text("Don't have an account ?"),
+                        SizedBox(width: 10,),
                         SizedBox(height: 10,),
                         InkWell(
                             onTap: (){
-                              _navigate();
+                              navigate(context,2);
                             },
                             child: Text("Signup",style: TextStyle(color: Colors.blue),))
                       ],
                     ),
+                  ),
+                  SizedBox(height: 30,),
+
+                  Observer(
+                    builder: (context) {
+                      print("show-msg");
+                      print( _firebaseUserStore.showMessage);
+                      return Visibility(
+                        visible: _firebaseUserStore.showMessage,
+                        child: Text(_firebaseUserStore.errorMsg),
+                      );
+                    },
+                  ),
+                  SizedBox(height: 30,),
+                  Observer(
+                    builder: (context) {
+                      return Visibility(
+                        visible: _firebaseUserStore.loading,
+                        child: CircularProgressIndicator(color: Colors.blue,),
+                      );
+                    },
+                  ),
+                  Observer(
+                    builder: (context) {
+                      print("sucess ::${_firebaseUserStore.userLogin}");
+                      return  _firebaseUserStore.userLogin
+                          ?navigate(context,1)
+                          :Container(); //unsecess message
+                    },
                   ),
                 ],
               ),
@@ -222,6 +257,30 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         ),
       ),
     );
+  }
+
+  Widget navigate(BuildContext context,int type) {
+    if(type==1){
+      Future.delayed(Duration(milliseconds: 0), () {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+            Routes.home, (Route<dynamic> route) => false);
+      });
+    }
+    else if(type==2){
+      Future.delayed(Duration(milliseconds: 0), () {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+            Routes.register, (Route<dynamic> route) => false);
+      });
+    }
+
+
+    return Container();
+  }
+
+
+  void _loginTask() {
+    print('login user');
+    _firebaseUserStore.loginUser(_emailController.text,_passwordController.text,context);
   }
 
 
@@ -249,12 +308,13 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   @override
   void dispose() {
     // Clean up the controller when the Widget is removed from the Widget tree
-   _phoneController.dispose();
+   _emailController.dispose();
+   _passwordController.dispose();
     _passwordFocusNode.dispose();
     super.dispose();
   }
 
-  void _navigate() {}
+
 
 
 

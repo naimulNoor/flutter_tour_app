@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_tour_app_firebase/models/app/trip_model.dart';
+import 'package:flutter_tour_app_firebase/stores/trip/trip_store.dart';
 import 'package:flutter_tour_app_firebase/utils/routes/routes.dart';
 import 'package:another_flushbar/flushbar_helper.dart';
 import 'package:flutter/foundation.dart';
@@ -27,21 +30,19 @@ class _LoginScreenState extends State<TripDetailsScreen> with TickerProviderStat
 
   int checkedIndex = 0;
 
-  List cardNames = [
-    'Driver',
-    'Verdor',
-  ];
+
 
   TextEditingController _phoneController = TextEditingController();
   bool _obscureText = false;
   bool _obscure = false;
-
+  var type =0;
   int currentTap=0;
-
+  QueryDocumentSnapshot<Object?>? doc=null;
   //stores:---------------------------------------------------------------------
 
   late ThemeStore _themeStore;
   late LanguageStore _languageStore;
+  late TripStore _tripStore;
 
 
   //focus node:-----------------------------------------------------------------
@@ -72,6 +73,14 @@ class _LoginScreenState extends State<TripDetailsScreen> with TickerProviderStat
     // initializing stores
     _languageStore = Provider.of<LanguageStore>(context);
     _themeStore = Provider.of<ThemeStore>(context);
+    _tripStore=Provider.of<TripStore>(context);
+
+
+    final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
+    doc=arguments['data'];
+    type=arguments['type'];
+    print("id-details");
+    print(doc?.id.toString());
 
 
   }
@@ -96,7 +105,7 @@ class _LoginScreenState extends State<TripDetailsScreen> with TickerProviderStat
            Stack(
              children: [
                Image.network(
-                 'https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg',
+                 doc?.get("trip_img"),
                ),
                Icon(Icons.chevron_left),
 
@@ -120,31 +129,42 @@ class _LoginScreenState extends State<TripDetailsScreen> with TickerProviderStat
                    children: [
                      Icon(Icons.calendar_today,size: 15.0,),
                      SizedBox(width: 10.0,),
-                     Text("06/06/2021")
+                     Text(doc?.get("date"))
                    ],
                  ),
                  const SizedBox(height: 16),
-                 Text('Norge',style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold),),
-                 Text('Test trip details',style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.w500,color: Colors.grey),),
+                 Text(doc?.get("trip_name"),style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold),),
+                 Text(doc?.get("subtitle"),style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.w500,color: Colors.grey),),
                  const SizedBox(height: 16),
-                 Text('We can also use the fit parameter to define whether our stack should expand to fill the parent widget, or whether it should pass through the fit of child objects directly to the children in the Stack.Broadly speaking, these only apply in more advanced layout scenarios, so we should be fine leaving the fit as StackFit.loose, which is the default.We can also position widgets within the stack itself by using Positioned. If we add a Container with a blue background, place some text in it, and position it at the bottom center, the widget lays out accordingly within the bounds of the Stack.',style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.w500,color: Colors.grey),),
+                 Text(doc?.get("details"),style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.w500,color: Colors.grey),),
                  const SizedBox(height: 16),
                  MaterialButton(
                    color: Colors.redAccent,
-                   onPressed: (){},
+                   onPressed: (){
+                     _bookedTrip();
+                   },
                    shape: RoundedRectangleBorder(
                        borderRadius: BorderRadius.circular(10)),
                    minWidth: MediaQuery.of(context).size.width,
                    height: 50,
 
-                   child: Text(
-                     'Neste',style: TextStyle(
-                       fontWeight: FontWeight.bold,
-                       fontSize: 15,
-                       color: Colors.white
-                   ),
-                   ),
+                   child: doc?.get("isbooked")==true?
+                      Text('Cancle',style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: Colors.white
+                      ))
+                       :
+                     Text('Book now',style: TextStyle(
+                         fontWeight: FontWeight.bold,
+                         fontSize: 15,
+                         color: Colors.white
+                     ),
+                     ),
                  ),
+                 const SizedBox(height: 30),
+
+
                ],
              ),
            ),
@@ -154,8 +174,6 @@ class _LoginScreenState extends State<TripDetailsScreen> with TickerProviderStat
      ),
    );
   }
-
-
 
 
 
@@ -185,5 +203,18 @@ class _LoginScreenState extends State<TripDetailsScreen> with TickerProviderStat
     super.dispose();
   }
 
+  void _bookedTrip() {
+    _tripStore.bookedTrip(doc?.id.toString(),type);
+  }
+
+
+   navigate(BuildContext context,int type) {
+    if (type == 1) {
+      Future.delayed(Duration(milliseconds: 0), () {
+        Navigator.of(context).pushNamed(Routes.bookedTrip);
+      });
+    }
+
+  }
 
 }

@@ -22,6 +22,20 @@ mixin _$FirebaseUser on _FirebaseUserStore, Store {
       (_$showMessageComputed ??= Computed<bool>(() => super.showMessage,
               name: '_FirebaseUserStore.showMessage'))
           .value;
+  Computed<bool>? _$getUserRegisterComputed;
+
+  @override
+  bool get getUserRegister =>
+      (_$getUserRegisterComputed ??= Computed<bool>(() => super.getUserRegister,
+              name: '_FirebaseUserStore.getUserRegister'))
+          .value;
+  Computed<bool>? _$getUserLoginComputed;
+
+  @override
+  bool get getUserLogin =>
+      (_$getUserLoginComputed ??= Computed<bool>(() => super.getUserLogin,
+              name: '_FirebaseUserStore.getUserLogin'))
+          .value;
   Computed<String>? _$getErrorMessageComputed;
 
   @override
@@ -64,6 +78,36 @@ mixin _$FirebaseUser on _FirebaseUserStore, Store {
   set showErrorMsg(bool value) {
     _$showErrorMsgAtom.reportWrite(value, super.showErrorMsg, () {
       super.showErrorMsg = value;
+    });
+  }
+
+  final _$userRegisterAtom = Atom(name: '_FirebaseUserStore.userRegister');
+
+  @override
+  bool get userRegister {
+    _$userRegisterAtom.reportRead();
+    return super.userRegister;
+  }
+
+  @override
+  set userRegister(bool value) {
+    _$userRegisterAtom.reportWrite(value, super.userRegister, () {
+      super.userRegister = value;
+    });
+  }
+
+  final _$userLoginAtom = Atom(name: '_FirebaseUserStore.userLogin');
+
+  @override
+  bool get userLogin {
+    _$userLoginAtom.reportRead();
+    return super.userLogin;
+  }
+
+  @override
+  set userLogin(bool value) {
+    _$userLoginAtom.reportWrite(value, super.userLogin, () {
+      super.userLogin = value;
     });
   }
 
@@ -124,8 +168,8 @@ mixin _$FirebaseUser on _FirebaseUserStore, Store {
   final _$logoutAsyncAction = AsyncAction('_FirebaseUserStore.logout');
 
   @override
-  Future<dynamic> logout(String name, String email, String password) {
-    return _$logoutAsyncAction.run(() => super.logout(name, email, password));
+  Future<dynamic> logout() {
+    return _$logoutAsyncAction.run(() => super.logout());
   }
 
   final _$loginUserAsyncAction = AsyncAction('_FirebaseUserStore.loginUser');
@@ -142,11 +186,15 @@ mixin _$FirebaseUser on _FirebaseUserStore, Store {
     return '''
 isUserCreated: ${isUserCreated},
 showErrorMsg: ${showErrorMsg},
+userRegister: ${userRegister},
+userLogin: ${userLogin},
 errorMsg: ${errorMsg},
 success: ${success},
 addUserTask: ${addUserTask},
 loading: ${loading},
 showMessage: ${showMessage},
+getUserRegister: ${getUserRegister},
+getUserLogin: ${getUserLogin},
 getErrorMessage: ${getErrorMessage},
 isLoading: ${isLoading}
     ''';

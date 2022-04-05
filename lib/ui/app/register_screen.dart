@@ -31,7 +31,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
   TextEditingController _confirmPasswordController = TextEditingController();
   bool _obscureText = false;
   bool _obscure = false;
-
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   int currentTap=0;
 
   //stores:---------------------------------------------------------------------
@@ -79,6 +79,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       primary: true,
       appBar: EmptyAppBar(),
       body: _buildBody(),
@@ -250,7 +251,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                         suffixIcon: IconButton(
                           icon: Icon(
                             // Based on passwordVisible state choose the icon
-                            _passwordVisible
+                            _passwordVisibleTwo
                                 ? Icons.visibility
                                 : Icons.visibility_off,
                             color:Colors.blue,
@@ -258,7 +259,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                           onPressed: () {
                             // Update the state i.e. toogle the state of passwordVisible variable
                             setState(() {
-                              _passwordVisible = !_passwordVisible;
+                              _passwordVisibleTwo = !_passwordVisibleTwo;
                             });
                           },
                         ),
@@ -340,8 +341,9 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                   ),
                   Observer(
                     builder: (context) {
-                      return  _firebaseUserStore.success
-                          ?navigate(context,0)
+                      print("sucess ::${_firebaseUserStore.userRegister}");
+                      return  _firebaseUserStore.userRegister
+                          ?navigate(context,1)
                           :Container(); //unsecess message
                     },
                   ),
@@ -356,7 +358,11 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
 
   Widget navigate(BuildContext context,int type) {
     if(type==1){
+
       Future.delayed(Duration(milliseconds: 0), () {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Register Sucessfully"),
+        ));
         Navigator.of(context).pushNamedAndRemoveUntil(
             Routes.login, (Route<dynamic> route) => false);
       });
@@ -400,13 +406,12 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
   void _navigate() {}
 
   void _registerAuthTask() {
-    print('register user');
-    print(_nameController.text);
-    print(_emailController.text);
-    print(_passwordController.text);
+    if(_passwordController.text==_confirmPasswordController.text){
+      _firebaseUserStore.registerUser(_nameController.text,_emailController.text,_passwordController.text,);
+    }else{
+      _scaffoldKey.currentState?.showSnackBar(new SnackBar(content: new Text("Please Provide Same Password")));
+    }
 
-
-    _firebaseUserStore.registerUser(_nameController.text,_emailController.text,_passwordController.text,);
   }
 
   void _openToast(String s) {
