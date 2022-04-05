@@ -9,7 +9,6 @@ import 'package:flutter_tour_app_firebase/stores/trip/trip_store.dart';
 import 'package:flutter_tour_app_firebase/ui/app/splash_screen.dart';
 import 'package:flutter_tour_app_firebase/utils/routes/routes.dart';
 import 'package:flutter_tour_app_firebase/stores/language/language_store.dart';
-import 'package:flutter_tour_app_firebase/stores/post/post_store.dart';
 import 'package:flutter_tour_app_firebase/stores/theme/theme_store.dart';
 import 'package:flutter_tour_app_firebase/utils/locale/app_localization.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +24,6 @@ class MyApp extends StatelessWidget {
   // Create your store as a final variable in a base Widget. This works better
   // with Hot Reload than creating it directly in the `build` function.
   final ThemeStore _themeStore = ThemeStore(getIt<Repository>());
-  final PostStore _postStore = PostStore(getIt<Repository>());
   final LanguageStore _languageStore = LanguageStore(getIt<Repository>());
   final FirebaseUser _firebaseUserStore = FirebaseUser(getIt<FireAuthRepository>());
   final TripStore _tripStore = TripStore(getIt<TripFireStoreRepository>());
@@ -35,7 +33,6 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         Provider<ThemeStore>(create: (_) => _themeStore),
-        Provider<PostStore>(create: (_) => _postStore),
         Provider<LanguageStore>(create: (_) => _languageStore),
         Provider<TripStore>(create: (_) => _tripStore),
         Provider<FirebaseUser>(create: (_) => _firebaseUserStore),

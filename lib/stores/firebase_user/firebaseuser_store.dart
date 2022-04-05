@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_tour_app_firebase/data/driver_firestore_repository.dart';
 import 'package:flutter_tour_app_firebase/data/repository/firebase_auth_repository.dart';
 import 'package:flutter_tour_app_firebase/data/sharedpref/shared_preference_helper.dart';
 import 'package:flutter_tour_app_firebase/models/app/driver.dart';

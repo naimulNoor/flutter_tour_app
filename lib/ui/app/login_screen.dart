@@ -265,6 +265,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         Navigator.of(context).pushNamedAndRemoveUntil(
             Routes.home, (Route<dynamic> route) => false);
       });
+      _firebaseUserStore.userLogin=false;
     }
     else if(type==2){
       Future.delayed(Duration(milliseconds: 0), () {

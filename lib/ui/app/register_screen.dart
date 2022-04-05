@@ -358,7 +358,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
 
   Widget navigate(BuildContext context,int type) {
     if(type==1){
-
+      _firebaseUserStore.userRegister=false;
       Future.delayed(Duration(milliseconds: 0), () {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text("Register Sucessfully"),
